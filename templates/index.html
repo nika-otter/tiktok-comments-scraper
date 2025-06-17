@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>TikTok Розіграш</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script>
+        function showLoader() {
+            document.getElementById("loader").style.display = "block";
+        }
+
+        function clearForm() {
+            document.querySelector("input[name='video_url']").value = "";
+            document.querySelector("input[name='no_duplicates']").checked = false;
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+
+        <h1>🎉 Розіграш в коментарях TikTok</h1>
+
+        <form method="POST" onsubmit="showLoader()">
+            <input type="text" name="video_url" placeholder="Вставте лінк на відео" required value="{{ request.form.video_url or '' }}">
+            <label><input type="checkbox" name="no_duplicates" {% if 'no_duplicates' in request.form %}checked{% endif %}> Без дублікатів</label>
+            <div>
+                <button type="submit" name="get_comments">Отримати коментарі</button>
+                {% if users %}
+                <button type="submit" name="pick_winner" value="1">🎯 Обрати переможця</button>
+                {% endif %}
+                <button type="submit" name="clear" >🧹 Очистити</button>
+            </div>
+        </form>
+
+
+        <div id="loader" style="display: none;">
+            <div class="loader-box">
+                <div class="spinner"></div>
+                    <p>Завантаження...</p>
+            </div>
+        </div>
+
+        {% if winner %}
+            <h2>🏆 Переможець: <a href="{{ winner[3] }}" target="_blank">{{ winner[2] }}</a></h2>
+        {% endif %}
+
+        {% if error %}
+            <p class="error">Помилка: {{ error }}</p>
+        {% endif %}
+        {% if users %}
+
+        <h2>Учасники ({{ users|length }})</h2>
+        <ul>
+            {% for u in users %}
+                <li><a href="{{ u[3] }}" target="_blank">{{ u[2] }}</a>: {{ u[0] }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+
+</body>
+</html>
