@@ -168,26 +168,57 @@ h2 {
 
 @media (max-width: 600px) {
     .container {
-        margin: 20px 10px;
+        margin: 16px;
         padding: 20px;
         border-radius: 12px;
     }
 
-    button {
-        width: 100%;
-    }
-
-    form > div {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5em;
-    }
-
     h1 {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
+        line-height: 1.4;
+        text-align: center;
     }
 
     input[type="text"] {
-        font-size: 0.95rem;
+        font-size: 1.1rem;
+        padding: 0.85em 1.1em;
+        border-radius: 14px;
+    }
+
+    label {
+        font-size: 1rem;
+    }
+
+    button {
+        width: 100%;
+        font-size: 1.05rem;
+        padding: 0.8em;
+        border-radius: 12px;
+        margin-top: 8px; /* додано */
+    }
+
+    button:first-of-type {
+        margin-top: 0;
+    }
+
+    ul li {
+        font-size: 1rem;
+        padding: 0.9em 1.1em;
+    }
+
+    form {
+        gap: 0.5rem; /* трохи зменшили */
+    }
+
+    .loader-box {
+        min-width: 180px;
+        min-height: 130px;
+        padding: 24px;
+    }
+
+    .spinner {
+        width: 52px;
+        height: 52px;
+        border-width: 7px;
     }
 }

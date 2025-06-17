@@ -2,6 +2,7 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>TikTok Розіграш</title>
     <link rel="stylesheet" href="/static/style.css">
     <script>
@@ -21,7 +22,7 @@
         <h1>🎉 Розіграш в коментарях TikTok</h1>
 
         <form method="POST" onsubmit="showLoader()">
-            <input type="text" name="video_url" placeholder="Вставте лінк на відео" required value="{{ request.form.video_url or '' }}">
+            <input type="text" name="video_url" placeholder="Вставте лінк на відео" value="{{ request.form.video_url or '' }}" >
             <label><input type="checkbox" name="no_duplicates" {% if 'no_duplicates' in request.form %}checked{% endif %}> Без дублікатів</label>
             <div>
                 <button type="submit" name="get_comments">Отримати коментарі</button>
