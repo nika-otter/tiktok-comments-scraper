@@ -1,57 +1,53 @@
-import secrets
-import uuid
-
-from flask import Flask, request, render_template, session
+from flask import Flask, request, render_template
 from parser import get_comments
 import random
 import time
-import pandas as pd
-import os
+import threading
 
 app = Flask(__name__)
-app.secret_key = secrets.token_hex(32)
+
+all_users = []
+processing = False
+processing_error = None
+
+def parse_comments_in_background(video_url, no_duplicates):
+    global all_users, processing, processing_error
+    try:
+        comments = get_comments(video_url)
+        if no_duplicates:
+            seen = set()
+            comments = [u for u in comments if u[1] not in seen and not seen.add(u[1])]
+        all_users = comments
+        processing_error = None
+    except Exception as e:
+        processing_error = str(e)
+    finally:
+        processing = False
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    all_users = []
+    global all_users, processing, processing_error
     winner = None
-    error = None
-    tmp_path = session.get('csv_path')
-    if tmp_path and os.path.exists(tmp_path):
-        try:
-            df = pd.read_csv(tmp_path)
-            all_users = df.values.tolist()
-        except Exception as e:
-            error = f"Помилка при зчитуванні з файлу: {e}"
+    error = processing_error
 
     if request.method == 'POST':
         if 'clear' in request.form:
-            time.sleep(3)
-            if tmp_path and os.path.exists(tmp_path):
-                os.remove(tmp_path)
-            session.pop('csv_path', None)
-            return render_template('index.html', users=[], winner=None)
+            all_users = []
+            processing_error = None
+            return render_template('index.html', users=[], winner=None, error=None, processing=False)
 
-        video_url = request.form['video_url']
-        no_duplicates = 'no_duplicates' in request.form
         if 'get_comments' in request.form:
-            try:
-                users = get_comments(video_url)
-                if no_duplicates:
-                    seen = set()
-                    users = [u for u in all_users if u[1] not in seen and not seen.add(u[1])]
-                df = pd.DataFrame(users, columns=['comment_text', 'user_id', 'nickname', 'profile_url'])
-                tmp_filename = f"/tmp/{uuid.uuid4().hex}.csv"
-                df.to_csv(tmp_filename, index=False)
-                session['csv_path'] = tmp_filename
-                all_users = users
-            except Exception as e:
-                error = str(e)
+            video_url = request.form['video_url']
+            no_duplicates = 'no_duplicates' in request.form
+            if not processing:
+                processing = True
+                threading.Thread(target=parse_comments_in_background, args=(video_url, no_duplicates)).start()
 
         if 'pick_winner' in request.form:
             time.sleep(3)
             winner = random.choice(all_users) if all_users else None
 
-    return render_template('index.html', users=all_users, winner=winner, error=error)
+    return render_template('index.html', users=all_users, winner=winner, error=error, processing=processing)
 
 if __name__ == '__main__':
     from os import environ

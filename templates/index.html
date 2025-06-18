@@ -15,6 +15,10 @@
             document.querySelector("input[name='no_duplicates']").checked = false;
         }
     </script>
+    {% if processing %}
+    <meta http-equiv="refresh" content="5">
+    {% endif %}
+
 </head>
 <body>
     <div class="container">
@@ -33,13 +37,21 @@
             </div>
         </form>
 
-
-        <div id="loader" style="display: none;">
-            <div class="loader-box">
-                <div class="spinner"></div>
-                    <p>Завантаження...</p>
+        {% if processing %}
+            <div id="loader" style="display: block;">
+                <div class="loader-box">
+                    <div class="spinner"></div>
+                    <p>Завантаження коментарів… Зачекайте, будь ласка.</p>
+                </div>
             </div>
-        </div>
+        {% else %}
+            <div id="loader" style="display: none;">
+                <div class="loader-box">
+                    <div class="spinner"></div>
+                    <p>Завантаження...</p>
+                </div>
+            </div>
+        {% endif %}
 
         {% if winner %}
             <h2>🏆 Переможець: <a href="{{ winner[3] }}" target="_blank">{{ winner[2] }}</a></h2>
@@ -48,8 +60,8 @@
         {% if error %}
             <p class="error">Помилка: {{ error }}</p>
         {% endif %}
-        {% if users %}
 
+        {% if users %}
         <h2>Учасники ({{ users|length }})</h2>
         <ul>
             {% for u in users %}
@@ -57,7 +69,7 @@
             {% endfor %}
         </ul>
         {% endif %}
-    </div>
 
+    </div>
 </body>
 </html>
