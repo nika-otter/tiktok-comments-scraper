@@ -25,17 +25,46 @@
 
         <h1>🎉 Розіграш в коментарях TikTok</h1>
 
-        <form method="POST" onsubmit="showLoader()">
-            <input type="text" name="video_url" placeholder="Вставте лінк на відео" value="{{ request.form.video_url or '' }}" >
-            <label><input type="checkbox" name="no_duplicates" {% if 'no_duplicates' in request.form %}checked{% endif %}> Без дублікатів</label>
-            <div>
-                <button type="submit" name="get_comments">Отримати коментарі</button>
-                {% if users %}
-                <button type="submit" name="pick_winner" value="1">🎯 Обрати переможця</button>
-                {% endif %}
-                <button type="submit" name="clear" >🧹 Очистити</button>
+            <form method="POST" onsubmit="showLoader()">
+                <input type="text" name="video_url" placeholder="Вставте лінк на відео" value="" >
+                <label><input type="checkbox" name="no_duplicates" {% if 'no_duplicates' in request.form %}checked{% endif %}> Без дублікатів</label>
+
+                <div class="button-row">
+                    <button type="submit" name="get_comments">💬 Отримати коментарі</button>
+                    {% if users %}
+                        <button type="button" onclick="startSlot()">🎯 Обрати переможця</button>
+                    {% endif %}
+                    <button type="submit" name="clear">🧹 Очистити</button>
+                </div>
+            </form>
+<!--        {% if video_link %}-->
+<!--            <p style="margin-top: 10px;">🔗 Лінк на відео: <a href="{{ video_link }}" target="_blank">{{ video_link }}</a></p>-->
+<!--        {% endif %}-->
+
+        {% if users %}
+<!--            <button onclick="startSlot()">🎯 Обрати переможця</button>-->
+
+            <div id="slot-wrapper" style="display: none; position: relative; margin-top: 30px; text-align: center;">
+<!--            <div style="position: absolute; top: 40px; right: -1px; z-index: 10;">-->
+<!--                <div style="width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-right: 15px solid #38b000;"></div>-->
+<!--            </div>-->
+
+                <!-- Слот -->
+                <div id="slot-machine"
+                    style="height: 120px; overflow: hidden; border: 3px solid #48cae4; border-radius: 10px; width: 300px; margin: 0 auto; position: relative; background: #f1f1f1;">
+                    <div id="slot-inner"
+                        style="position: absolute; top: 0; width: 100%; transition: top 5s cubic-bezier(0.25, 1, 0.5, 1); font-size: 22px; text-align: center;">
+                    </div>
+                </div>
+
+                <p id="winner-text"
+                    style="font-size: 24px; font-weight: bold; text-align: center; display: none; margin-top: 10px;"></p>
             </div>
-        </form>
+        {% endif %}
+
+
+
+
 
         {% if processing %}
             <div id="loader" style="display: block;">
@@ -71,5 +100,79 @@
         {% endif %}
 
     </div>
+<script>
+    const users = {{ users | tojson }};
+    const slotInner = document.getElementById("slot-inner");
+    const slotWrapper = document.getElementById("slot-wrapper");
+    const winnerText = document.getElementById("winner-text");
+
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+    }
+
+    function startSlot() {
+    slotWrapper.style.display = "block";
+    slotInner.innerHTML = "";
+    winnerText.style.display = "none";
+
+    // ❗ Скинути попередню анімацію
+    slotInner.style.transition = "none";
+    slotInner.style.top = "0px";
+
+    // Сила прокрутки
+    const visibleCount = 3;
+    const rowHeight = 40;
+    const centerOffset = Math.floor(visibleCount / 2);
+
+    let names = [...users];
+    shuffleArray(names);
+
+    let repeated = [];
+    for (let i = 0; i < 25; i++) {
+        repeated.push(...names);
+    }
+
+    repeated.forEach((user, index) => {
+        const div = document.createElement("div");
+        div.textContent = user[2];
+        div.style.height = rowHeight + "px";
+        div.style.lineHeight = rowHeight + "px";
+        div.style.backgroundColor = index % 2 === 0 ? "#e0f7fa" : "#fff3cd";
+        div.style.fontWeight = "normal";
+        div.style.transition = "none";
+        slotInner.appendChild(div);
+    });
+
+    const winnerIndex = Math.floor(Math.random() * names.length);
+    const targetIndex = repeated.length - names.length + winnerIndex - centerOffset;
+    const topOffset = -targetIndex * rowHeight;
+
+    // ❗ Невелика затримка перед запуском анімації
+    setTimeout(() => {
+        slotInner.style.transition = "top 5s cubic-bezier(0.25, 1, 0.5, 1)";
+        slotInner.style.top = topOffset + "px";
+    }, 50); // 50ms пауза, щоб браузер встиг "переварити" скидання
+
+    setTimeout(() => {
+        const winner = names[winnerIndex];
+        const allDivs = slotInner.children;
+        const highlighted = allDivs[targetIndex + centerOffset];
+        highlighted.style.backgroundColor = "#38b000";
+        highlighted.style.color = "white";
+        highlighted.style.fontWeight = "bold";
+
+        winnerText.innerHTML = `🏆 Переможець: <a href="${winner[3]}" target="_blank" style="color: #38b000;">${winner[2]}</a>`;
+        winnerText.style.display = "block";
+    }, 5100);
+}
+
+</script>
+
+
+
+
 </body>
 </html>

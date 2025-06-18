@@ -29,7 +29,7 @@ def index():
     global all_users, processing, processing_error
     winner = None
     error = processing_error
-
+    video_link = ''
     if request.method == 'POST':
         if 'clear' in request.form:
             all_users = []
@@ -47,7 +47,15 @@ def index():
             time.sleep(3)
             winner = random.choice(all_users) if all_users else None
 
-    return render_template('index.html', users=all_users, winner=winner, error=error, processing=processing)
+    return render_template(
+        'index.html',
+        users=all_users,
+        winner=winner,
+        error=error,
+        processing=processing,
+        video_link=video_link
+    )
+
 
 if __name__ == '__main__':
     from os import environ
