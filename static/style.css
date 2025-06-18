@@ -172,6 +172,12 @@ h2 {
     margin-top: 4px;
     align-items: center;
 }
+#slot-machine {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
 
 
 @media (max-width: 600px) {
