@@ -93,9 +93,13 @@
             </div>
         {% endif %}
 
-        {% if winner %}
-            <h2>🏆 Переможець: <a href="{{ winner[3] }}" target="_blank">{{ winner[2] }}</a></h2>
-        {% endif %}
+<!--        {% if winner %}-->
+<!--            <h2>🏆 Переможець:rg445h45h54h6h <a href="{{ winner[3] }}" target="_blank">{{ winner[2] }}</a></h2>-->
+<!--            <h2><p>Winner text: {{ winner[1] }}</p></h2>-->
+<!--            <ul>-->
+<!--                <li><a href="{{ winner[3] }}" target="_blank">{{ winner[2] }}</a>: {{ winner[0] }}</li>-->
+<!--            </ul>-->
+<!--        {% endif %}-->
 
         {% if error %}
             <p class="error">Помилка: {{ error }}</p>
@@ -175,9 +179,13 @@
         highlighted.style.color = "white";
         highlighted.style.fontWeight = "bold";
 
-        winnerText.innerHTML = `🏆 Переможець: <a href="${winner[3]}" target="_blank" style="color: #38b000;">${winner[2]}</a>`;
+        winnerText.innerHTML = `🏆 Переможець: <a href="${winner[3]}" target="_blank" style="color: #38b000;">${winner[2]}</a>
+                                <ul>
+                                  <li><a href="${winner[3]}" target="_blank">${winner[2]}</a>: ${winner[0]}</li>
+                                </ul>`;
         winnerText.style.display = "block";
     }, 5100);
+
 }
 
 </script>
